@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <getopt.h>
 #include "cache.h"
+#include "interprete.h"
 
 #define ERROR_LECTURA -1
 #define ERROR_LEC_INT 1
@@ -132,7 +133,8 @@ bool config_invalida(config_t config){
 }
 
 int main(int argc, char* argv[]){		
-
+	
+	/* Manejo de la entrada */
 	config_t configuracion = leer_argumentos(argc, argv);	
 
 	if(configuracion.ayuda){
@@ -149,17 +151,24 @@ int main(int argc, char* argv[]){
 		fprintf(stderr,"Error en los argumentos ingresados. Consulta las ayudas con ./tp2 -h\n");
 		return ERROR_LECTURA;
 	}	
-
-	printf("Overflow: %d\nargumentos_equi: %d\nayuda %d\nversion %d\ntamanio_cache %d\ncantidad_vias %d\ntamanio_bloque %d\narchivo_entrada %s\n archivo_salida %s\n",
-			configuracion.overflow,
-			configuracion.argumentos_equivocados,
-			configuracion.ayuda,
-			configuracion.version,
-			configuracion.tamanio_cache,
-			configuracion.cantidad_vias,
-			configuracion.tamanio_bloque,
-			configuracion.archivo_entrada,
-			configuracion.archivo_salida);
-
+	
+	/* Setteando hiper parametros */
+	tamanio_cache = configuracion.tamanio_cache;
+	tamanio_bloque = configuracion.tamanio_bloque;
+	cant_vias = configuracion.cantidad_vias;
+	
+	/* interprete del cache */
+	interprete_t interprete;
+	interprete_crear(&interprete,
+					 configuracion.archivo_salida,
+					 configuracion.archivo_entrada);
+	
+	/* Se lee el archivo y se ejecuta correctamente */
+	init();
+	interprete_interpretar(&interprete);
+	cache_destruir();
+	
+	/* Fin de la aplicacion */
+	interprete_destruir(&interprete);
 	return 0;
 }

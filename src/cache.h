@@ -1,16 +1,18 @@
 #ifndef __CACHE_H__
 #define __CACHE_H__
 
-//ESTO SE TIENE QUE BORRAR
-//https://github.com/RamiroSanchez-dev/Organizacion-de-Computadoras
-//ESTO SE TIEN QUE BORRAR
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
 #define TAMANIO_MEMORIA_PRINCIPAL (64*1024)
 #define BITS_DIRECCION 16
+char memoria_ppal[TAMANIO_MEMORIA_PRINCIPAL];
+
+int tamanio_cache;
+int tamanio_bloque;
+int cant_vias;
+
 
 typedef struct bloque{
 	bool valido;
@@ -24,6 +26,7 @@ typedef struct via{
 	bloque_t* bloques;
 	int cant_bloques;
 	int bloque_mas_viejo;
+	int* tags;
 }via_t;
 
 
@@ -42,6 +45,7 @@ typedef struct cache{
 
 cache_t cache = {false, 0, 0, NULL, 0, 0, 0};
 
+void cache_destruir();
 
 //Debe inicializar los bloques de la caché como inválidos, la memoria 
 //simulada en 0 y la tasa de misses a 0.

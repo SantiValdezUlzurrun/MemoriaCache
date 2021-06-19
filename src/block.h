@@ -2,12 +2,16 @@
 #define __BLOCK_H__
 
 #include <stdbool.h>
+#include <stdlib.h>
 
 typedef struct {
   char* data;
   unsigned int tag;
   int antiguedad;
-  bool valido;
+  bool valid;
+  bool dirty;
+  unsigned short direccion;
+  int bs;
 } block_t;
 
 void block_init(block_t *block, int block_size);

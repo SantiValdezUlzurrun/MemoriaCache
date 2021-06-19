@@ -21,18 +21,6 @@ void cache_init() {
 	cache.bits_tag = BITS_DIRECCION - (cache.bits_index + cache.bits_offset);
 }
 
-via_t via_init() {
-	via_t via;
-	int cantidad_bloques = tamanio_cache/(cant_vias * tamanio_bloque);
-	
-	via.bloques = malloc(cantidad_bloques * sizeof(block_t));
-	for(int i = 0; i < cantidad_bloques; i++){
-		block_init(&via.bloques[i], tamanio_bloque);
-	}
-	via.cant_bloques = cantidad_bloques;
-	return via;
-}
-
 void init() {
 
 	if (cache.inicializada) {
@@ -41,8 +29,9 @@ void init() {
 	
 	cache_init();
 	cache.vias = malloc(cant_vias * sizeof(via_t));
+	int cantidad_bloques = tamanio_cache/(cant_vias * tamanio_bloque);
 	for(int i = 0; i < cant_vias; i++){
-		cache.vias[i] = via_init();
+		via_init(&cache.vias[i], cantidad_bloques, tamanio_bloque);
 	}	
 }
 
@@ -83,17 +72,10 @@ char get_miss_rate(){
 	return (cache.misses*100)/(accesos);
 }
 
-void via_destruir(via_t via){
-	for(int i = 0; i < via.cant_bloques; i++){
-		block_destroy(&via.bloques[i]);
-	}
-	free(via.bloques);
-}
 
 void cache_destruir() {
-
 	for(int i = 0; i < cant_vias; i++){
-		via_destruir(cache.vias[i]);
+		via_destroy(&cache.vias[i]);
 	}
 	free(cache.vias);
 	cache.inicializada = false;

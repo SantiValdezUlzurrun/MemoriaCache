@@ -24,30 +24,6 @@ void cache_init() {
 	cache.bits_tag = BITS_DIRECCION - (cache.bits_index + cache.bits_offset);
 }
 
-bloque_t bloque_init() {
-	bloque_t bloque;
-
-	bloque.valido = false;
-	bloque.dirty = false;
-	bloque.direccion = 0x0;
-	bloque.antiguedad = 0;
-	bloque.datos = malloc(tamanio_bloque * sizeof(char));
-	return bloque;
-}
-
-via_t via_init() {
-	via_t via;
-	int cantidad_bloques = tamanio_cache/(cant_vias * tamanio_bloque);
-	
-	via.bloques = malloc(cantidad_bloques * sizeof(bloque_t));
-	for(int i = 0; i < cantidad_bloques; i++){
-		via.bloques[i] = bloque_init();
-	}
-	via.cant_bloques = cantidad_bloques;
-	via.tags = calloc(cantidad_bloques, sizeof(int));
-	return via;
-}
-
 void init() {
 
 	if (cache.inicializada) {
@@ -56,8 +32,9 @@ void init() {
 	
 	cache_init();
 	cache.vias = malloc(cant_vias * sizeof(via_t));
+	int cantidad_bloques = tamanio_cache/(cant_vias * tamanio_bloque);
 	for(int i = 0; i < cant_vias; i++){
-		cache.vias[i] = via_init();
+		via_init(&cache.vias[i], cantidad_bloques, tamanio_bloque);
 	}	
 }
 
@@ -92,11 +69,11 @@ unsigned int get_offset(int address){
 	return address >> (cache.bits_tag + cache.bits_index);
 }
 
-bloque_t* obtener_bloque_de_cache(int address){
+block_t* obtener_bloque_de_cache(int address){
 	unsigned int set = find_set(address);
 	for(int i = 0; i < cant_vias; i++){
-		bloque_t* bloque = &(cache.vias[i].bloques[set]);
-		if((get_blocknum(address) == get_blocknum(bloque->direccion)) && (bloque->valido)){
+		block_t* bloque = &(cache.vias[i].bloques[set]);
+		if((get_blocknum(address) == get_blocknum(bloque->direccion)) && (bloque->valid)){
 			return bloque;
 		}
 	}
@@ -107,18 +84,19 @@ bool hay_hit(int address){
 	return (obtener_bloque_de_cache(address) != NULL);
 }
 
-bloque_t obtener_bloque_de_memoria(int address) {
-	bloque_t bloque = bloque_init();
-	bloque.valido = true;
+block_t obtener_bloque_de_memoria(int address) {
+	block_t bloque; 
+	block_init(&bloque, tamanio_bloque);
+	bloque.valid = true;
 	bloque.direccion = address;
-	memcpy(bloque.datos, &memoria_ppal[address], tamanio_bloque * sizeof(char));
+	memcpy(bloque.data, &memoria_ppal[address], tamanio_bloque * sizeof(char));
 	return bloque;
 }
 
 void actualizar_antiguedad(int address){
 	unsigned int set = find_set(address);
 	for (int i = 0; i < cant_vias; i++){
-		bloque_t* bloque = &cache.vias[i].bloques[set];
+		block_t* bloque = &cache.vias[i].bloques[set];
 		bloque->antiguedad++;
 	}
 }
@@ -132,7 +110,7 @@ void read_block(int blocknum) {
 	unsigned int set = find_set(address_16);
 	unsigned int posicion_via = find_earliest(set);
 	
-	bloque_destruir(cache.vias[posicion_via].bloques[set]);
+	block_destroy(&cache.vias[posicion_via].bloques[set]);
 	cache.vias[posicion_via].bloques[set] = obtener_bloque_de_memoria(address_16);
 }
 
@@ -147,8 +125,8 @@ char write_byte(int address, char value, char *hit) {
 	if(hay_hit(address)) {
 		cache.hits++;
 		unsigned int offset = get_offset(address);
-		bloque_t* bloque = obtener_bloque_de_cache(address);
-		bloque->datos[offset] = value;
+		block_t* bloque = obtener_bloque_de_cache(address);
+		bloque->data[offset] = value;
 		bloque->dirty = true;
 		actualizar_antiguedad(address);
 		bloque->antiguedad = 1;
@@ -167,22 +145,9 @@ char get_miss_rate(){
 	return (cache.misses*100)/(accesos);
 }
 
-void bloque_destruir(bloque_t bloque){
-	free(bloque.datos);
-}
-
-void via_destruir(via_t via){
-	for(int i = 0; i < via.cant_bloques; i++){
-		bloque_destruir(via.bloques[i]);
-	}
-	free(via.tags);
-	free(via.bloques);
-}
-
 void cache_destruir() {
-
 	for(int i = 0; i < cant_vias; i++){
-		via_destruir(cache.vias[i]);
+		via_destroy(&cache.vias[i]);
 	}
 	free(cache.vias);
 	cache.inicializada = false;

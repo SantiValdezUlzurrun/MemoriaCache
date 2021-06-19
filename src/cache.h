@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "block.h"
+#include "via.h"
+
 #define TAMANIO_MEMORIA_PRINCIPAL (64*1024)
 #define BITS_DIRECCION 16
 char memoria_ppal[TAMANIO_MEMORIA_PRINCIPAL];
@@ -12,23 +15,6 @@ char memoria_ppal[TAMANIO_MEMORIA_PRINCIPAL];
 int tamanio_cache;
 int tamanio_bloque;
 int cant_vias;
-
-
-typedef struct bloque{
-	bool valido;
-	bool dirty;
-	int antiguedad;
-	unsigned short direccion;
-	char* datos;
-}bloque_t;
-
-typedef struct via{
-	bloque_t* bloques;
-	int cant_bloques;
-	int bloque_mas_viejo;
-	int* tags;
-}via_t;
-
 
 typedef struct cache{
 	bool inicializada;

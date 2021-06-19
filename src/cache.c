@@ -21,24 +21,13 @@ void cache_init() {
 	cache.bits_tag = BITS_DIRECCION - (cache.bits_index + cache.bits_offset);
 }
 
-bloque_t bloque_init() {
-	bloque_t bloque;
-
-	bloque.valido = false;
-	bloque.dirty = false;
-	bloque.direccion = 0x0;
-	bloque.antiguedad = 0;
-	bloque.datos = malloc(tamanio_bloque * sizeof(char));
-	return bloque;
-}
-
 via_t via_init() {
 	via_t via;
 	int cantidad_bloques = tamanio_cache/(cant_vias * tamanio_bloque);
 	
-	via.bloques = malloc(cantidad_bloques * sizeof(bloque_t));
+	via.bloques = malloc(cantidad_bloques * sizeof(block_t));
 	for(int i = 0; i < cantidad_bloques; i++){
-		via.bloques[i] = bloque_init();
+		block_init(&via.bloques[i], tamanio_bloque);
 	}
 	via.cant_bloques = cantidad_bloques;
 	return via;
@@ -94,13 +83,9 @@ char get_miss_rate(){
 	return (cache.misses*100)/(accesos);
 }
 
-void bloque_destruir(bloque_t bloque){
-	free(bloque.datos);
-}
-
 void via_destruir(via_t via){
 	for(int i = 0; i < via.cant_bloques; i++){
-		bloque_destruir(via.bloques[i]);
+		block_destroy(&via.bloques[i]);
 	}
 	free(via.bloques);
 }

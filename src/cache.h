@@ -15,15 +15,6 @@ int tamanio_cache;
 int tamanio_bloque;
 int cant_vias;
 
-
-// typedef struct bloque{
-// 	bool valido;
-// 	bool dirty;
-// 	int antiguedad;
-// 	unsigned short direccion;
-// 	char* datos;
-// }bloque_t;
-
 typedef struct via{
 	block_t* bloques;
 	int cant_bloques;

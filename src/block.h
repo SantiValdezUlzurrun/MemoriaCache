@@ -22,5 +22,6 @@ bool tag_compare(block_t *block, unsigned int tag);
 bool is_valid(block_t *block);
 void set_valid(block_t *block);
 void set_tag(block_t *block, unsigned int tag_);
+void block_destroy(block_t *block);
 
 #endif /* __BLOCK_H__ */

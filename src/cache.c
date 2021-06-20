@@ -1,4 +1,5 @@
 #include "cache.h"
+
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
@@ -16,7 +17,7 @@ void cache_init() {
 	cache.inicializada = true;
 	cache.hits = 0;
 	cache.misses = 0;
-	cache.tamanio_cache = tamanio_cache;
+	cache.tamanio_cache = tamanio_cache * 1024;
 	cache.tamanio_bloque = tamanio_bloque;
 	cache.cant_vias = cant_vias;
 	cache.bits_index = bits_para_representar(cant_vias);
@@ -32,7 +33,7 @@ void init() {
 	
 	cache_init();
 	cache.vias = malloc(cant_vias * sizeof(via_t));
-	int cantidad_bloques = tamanio_cache/(cant_vias * tamanio_bloque);
+	int cantidad_bloques = cache.tamanio_cache/(cant_vias * tamanio_bloque);
 	for(int i = 0; i < cant_vias; i++){
 		via_init(&cache.vias[i], cantidad_bloques, tamanio_bloque);
 	}	
@@ -112,13 +113,35 @@ void read_block(int blocknum) {
 	
 	block_destroy(&cache.vias[posicion_via].bloques[set]);
 	cache.vias[posicion_via].bloques[set] = obtener_bloque_de_memoria(address_16);
+	actualizar_antiguedad(address_16);
+	cache.vias[posicion_via].bloques[set].antiguedad = 1;
 }
 
 void write_byte_tomem(int address, char value) {
 	memoria_ppal[address] = value;
 }
 
-char read_byte(int address, char *hit){}
+char read_byte_cache(int address){
+	
+	unsigned int offset = get_offset(address);
+	block_t* bloque = obtener_bloque_de_cache(address);
+	return bloque->data[offset];
+}
+
+char read_byte(int address, char *hit) {
+	
+	
+	if(!hay_hit(address)){
+		read_block(get_blocknum(address));	
+		cache.misses++;	
+		*hit = 0;
+	}else{
+		*hit = 1;
+		cache.hits++;
+	}
+	
+	return read_byte_cache(address);
+}
 
 char write_byte(int address, char value, char *hit) {
 	
@@ -132,6 +155,7 @@ char write_byte(int address, char value, char *hit) {
 		bloque->antiguedad = 1;
 		*hit = 1;
 	}else {
+		cache.misses++;
 		*hit = 0;
 	}
 	write_byte_tomem(address, value);

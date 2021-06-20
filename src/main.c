@@ -156,12 +156,11 @@ int main(int argc, char* argv[]){
 	tamanio_cache = configuracion.tamanio_cache;
 	tamanio_bloque = configuracion.tamanio_bloque;
 	cant_vias = configuracion.cantidad_vias;
-	
 	/* interprete del cache */
 	interprete_t interprete;
 	interprete_crear(&interprete,
-					 configuracion.archivo_salida,
-					 configuracion.archivo_entrada);
+				  	 configuracion.archivo_entrada,
+					 configuracion.archivo_salida);
 	
 	/* Se lee el archivo y se ejecuta correctamente */
 	init();

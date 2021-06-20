@@ -1,0 +1,44 @@
+#!/bin/bash
+echo #Esto hace un salto de linea
+
+echo "-- ARCHIVO prueba1.mem --"
+cat prueba1.mem
+echo "\n"
+echo  =========================================================
+echo "Cachesize: 4  ways:4  blocksize:32  archivo:prueba1.mem"
+echo  =========================================================
+./tp2 -c 4 -w 4 -b 32 prueba1.mem 
+
+echo 
+echo  =========================================================
+echo "Cachesize: 16  ways:1  blocksize:128  archivo:prueba1.mem"
+echo  =========================================================
+./tp2 -c 16 -w 1 -b 128 prueba1.mem
+
+echo "\n -- ARCHIVO prueba2.mem --"
+cat prueba2.mem
+echo "\n"
+echo  =========================================================
+echo "Cachesize: 4  ways:4  blocksize:32  archivo:prueba2.mem"
+echo  =========================================================
+./tp2 -c 4 -w 4 -b 32 prueba2.mem
+
+echo 
+echo  =========================================================
+echo "Cachesize: 16  ways:1  blocksize:128  archivo:prueba2.mem"
+echo  =========================================================
+./tp2 -c 16 -w 1 -b 128 prueba2.mem
+
+echo "\n -- ARCHIVO prueba3.mem --"
+cat prueba3.mem
+echo "\n"
+echo  =========================================================
+echo "Cachesize: 4  ways:4  blocksize:32  archivo:prueba3.mem"
+echo  =========================================================
+./tp2 -c 4 -w 4 -b 32 prueba3.mem
+
+echo 
+echo  =========================================================
+echo "Cachesize: 16  ways:1  blocksize:128  archivo:prueba3.mem"
+echo  =========================================================
+./tp2 -c 16 -w 1 -b 128 prueba3.mem

@@ -10,11 +10,6 @@
 
 #define TAMANIO_MEMORIA_PRINCIPAL (64*1024)
 #define BITS_DIRECCION 16
-char memoria_ppal[TAMANIO_MEMORIA_PRINCIPAL];
-
-int tamanio_cache;
-int tamanio_bloque;
-int cant_vias;
 
 typedef struct cache{
 	bool inicializada;
@@ -29,7 +24,12 @@ typedef struct cache{
 	int bits_offset;
 }cache_t;
 
-cache_t cache = {false, 0, 0, NULL, 0, 0, 0};
+cache_t cache;
+char memoria_ppal[TAMANIO_MEMORIA_PRINCIPAL];
+
+int tamanio_cache;
+int tamanio_bloque;
+int cant_vias;
 
 void cache_destruir();
 

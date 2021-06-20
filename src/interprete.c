@@ -6,37 +6,33 @@
 bool interprete_crear(interprete_t* interprete, char* archivo_entrada, char* archivo_salida){
 	if (!interprete) return ERROR;
 
-	if (!(interprete->archivo_entrada = fopen(archivo_entrada, "r")) || 
-	 	!(interprete->archivo_salida = fopen(archivo_salida, "w")))
+	if (!(interprete->archivo_entrada = fopen(archivo_entrada, "r")))// || 
+	 //	!(interprete->archivo_salida = fopen(archivo_salida, "w")))
 		return ERROR;
-	
+	interprete->archivo_salida = stdout;
 	return EXITO;
 }
-/*
+
 
 void escribir(interprete_t* inter){
+	char hit = 0;
 	int direccion = 0;
 	unsigned char byte = 0;
 	fscanf(inter->archivo_entrada, "%i,%hhu\n", &direccion, &byte);
-	write_byte(direccion, byte);
-	if(error){
-		fprintf(stderr, "Ocurrio un error: la direccion ingresada no es valida(%i)\n", direccion);
-	}else{
-		fprintf(inter->archivo_salida, "Escritura:\tDireccion(%05i)\t\tValor(%hhu)\t%s\n", direccion, byte, cache.hit?"Hit":"Miss");
-	}
+	write_byte(direccion, byte, &hit);	
+	fprintf(inter->archivo_salida, "Escritura:\tDireccion(%05i)\t\tValor(%hhu)\t%s\n", direccion, byte, hit? "Hit":"Miss");
 }
 
+
 void leer(interprete_t* inter){
+	char hit = 0;
 	int direccion = 0;
 	fscanf(inter->archivo_entrada, "%i\n",&direccion);
-	unsigned char byte = read_byte(direccion);
-	if(error){
-		fprintf(stderr, "Ocurrio un error: la direccion ingresada no es valida(%i)\n", direccion);
-	}else{
-		fprintf(inter->archivo_salida,"Lectura:\tDireccion(%05i)\t\tValor(%hhu)\t%s\n", direccion, byte, cache.hit?"Hit":"Miss");
-	}
+	unsigned char byte = read_byte(direccion, &hit);	
+	fprintf(inter->archivo_salida,"Lectura:\tDireccion(%05i)\t\tValor(%hhu)\t%s\n", direccion, byte, hit?"Hit":"Miss");
 }
-*/
+
+
 
 void interprete_interpretar(interprete_t* inter){
 

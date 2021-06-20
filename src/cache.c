@@ -47,18 +47,21 @@ unsigned int find_set(int address){
 }
 
 unsigned int find_earliest(int setnum){
-	if(0 < setnum && setnum < cache.tamanio_cache/(cache.cant_vias * cache.tamanio_bloque)) return setnum;
+    if(0 < setnum && setnum < cache.tamanio_cache/(cache.cant_vias * cache.tamanio_bloque)) return setnum;
+    int indice = 0;
+    int ant_actual = cache.vias[0].bloques[setnum].antiguedad;
+    if(ant_actual == 0) return indice;
 
-	int ant_actual = cache.vias[0].bloques[setnum].antiguedad;
-	for (int i = 1; i < cache.cant_vias; i++){
-		int ant_bloque = cache.vias[i].bloques[setnum].antiguedad;
-		if(ant_bloque == 0) return i;
+    for (int i = 1; i < cache.cant_vias; i++){
+        int ant_bloque = cache.vias[i].bloques[setnum].antiguedad;
+        if(ant_bloque == 0) return i;
 
-		if(ant_bloque > ant_actual){
-			ant_actual = ant_bloque;
-		}
-	}
-	return ant_actual;
+        if(ant_bloque > ant_actual){
+            ant_actual = ant_bloque;
+            indice = i;
+        }
+    }
+    return indice;
 }
 
 unsigned int get_blocknum(int address){
@@ -68,6 +71,10 @@ unsigned int get_blocknum(int address){
 unsigned int get_offset(int address){
 	unsigned int offset = address << (cache.bits_tag + cache.bits_index);
 	return address >> (cache.bits_tag + cache.bits_index);
+}
+
+unsigned int get_tag(int address){
+	return (address >> (cache.bits_offset + cache.bits_index));
 }
 
 block_t* obtener_bloque_de_cache(int address){
@@ -98,7 +105,9 @@ void actualizar_antiguedad(int address){
 	unsigned int set = find_set(address);
 	for (int i = 0; i < cant_vias; i++){
 		block_t* bloque = &cache.vias[i].bloques[set];
-		bloque->antiguedad++;
+		if(bloque->antiguedad != 0){
+			bloque->antiguedad++;
+		}
 	}
 }
 
@@ -110,7 +119,7 @@ void read_block(int blocknum) {
 	int address_16 = blocknum << cache.bits_offset;
 	unsigned int set = find_set(address_16);
 	unsigned int posicion_via = find_earliest(set);
-	
+
 	block_destroy(&cache.vias[posicion_via].bloques[set]);
 	cache.vias[posicion_via].bloques[set] = obtener_bloque_de_memoria(address_16);
 	actualizar_antiguedad(address_16);
@@ -124,7 +133,7 @@ void write_byte_tomem(int address, char value) {
 char read_byte_cache(int address){
 	
 	unsigned int offset = get_offset(address);
-	block_t* bloque = obtener_bloque_de_cache(address);
+	block_t* bloque = obtener_bloque_de_cache(get_blocknum(address) << cache.bits_offset);
 	return bloque->data[offset];
 }
 
@@ -146,6 +155,7 @@ char read_byte(int address, char *hit) {
 char write_byte(int address, char value, char *hit) {
 	
 	if(hay_hit(address)) {
+		printf("HIT\n");
 		cache.hits++;
 		unsigned int offset = get_offset(address);
 		block_t* bloque = obtener_bloque_de_cache(address);

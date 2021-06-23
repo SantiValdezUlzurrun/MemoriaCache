@@ -7,7 +7,7 @@ void block_init(block_t *block, int block_size){
   block-> dirty = false;
   block -> direccion = 0x0;
   block -> antiguedad = 0;
-  block -> data = malloc(block_size * sizeof(char));
+  block -> data = calloc(block_size, sizeof(char));
 }
 
 void write_block(block_t *block, unsigned char *mem_block){

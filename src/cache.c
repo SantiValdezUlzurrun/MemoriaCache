@@ -5,12 +5,12 @@
 #include <string.h>
 
 bool en_rango(unsigned int a_chequear, unsigned int maximo){
-	return (0 <= a_chequear && a_chequear <= maximo);
+	return (a_chequear <= maximo);
 }
 
 //Devuelve la cantidad de bits para representar el numero dado
 int bits_para_representar(int numero){
-	return (int) ceil(log2(numero));
+	return ceil(log2(numero));
 }
 
 void cache_init() {
@@ -20,7 +20,7 @@ void cache_init() {
 	cache.tamanio_cache = tamanio_cache * 1024;
 	cache.tamanio_bloque = tamanio_bloque;
 	cache.cant_vias = cant_vias;
-	cache.bits_index = bits_para_representar(cant_vias);
+	cache.bits_index = bits_para_representar(cache.tamanio_cache/(tamanio_bloque*cant_vias));
 	cache.bits_offset = bits_para_representar(tamanio_bloque);
 	cache.bits_tag = BITS_DIRECCION - (cache.bits_index + cache.bits_offset);
 }
@@ -32,30 +32,38 @@ void init() {
 	}
 	
 	cache_init();
-	cache.vias = malloc(cant_vias * sizeof(via_t));
+	cache.vias = calloc(cant_vias, sizeof(via_t));
 	int cantidad_bloques = cache.tamanio_cache/(cant_vias * tamanio_bloque);
 	for(int i = 0; i < cant_vias; i++){
-		via_init(&cache.vias[i], cantidad_bloques, tamanio_bloque);
-	}	
+		via_init(&(cache.vias[i]), cantidad_bloques, tamanio_bloque);
+	}
 }
 
-
 unsigned int find_set(int address){
+	unsigned short address_16 = address;
+	address_16 = address_16 << cache.bits_tag;
+	address_16 = address_16 >> (cache.bits_offset + cache.bits_tag);
+	unsigned int valor_retorno = (0xFFFF & address_16);
+	return valor_retorno;
+	/*
 	unsigned short index = address << cache.bits_tag;
   	index = index >> (cache.bits_offset + cache.bits_tag);
-  	return index;
+  	return index;*/
 }
 
 unsigned int find_earliest(int setnum){
-    if(0 < setnum && setnum < cache.tamanio_cache/(cache.cant_vias * cache.tamanio_bloque)) return setnum;
+    if(!(0 <= setnum && setnum <= cache.tamanio_cache/(cache.cant_vias * cache.tamanio_bloque))) return setnum;
     int indice = 0;
+
     int ant_actual = cache.vias[0].bloques[setnum].antiguedad;
-    if(ant_actual == 0) return indice;
+    bool valido = cache.vias[0].bloques[setnum].valid;
+    if(!valido) return 0;
 
     for (int i = 1; i < cache.cant_vias; i++){
-        int ant_bloque = cache.vias[i].bloques[setnum].antiguedad;
-        if(ant_bloque == 0) return i;
+        valido = cache.vias[i].bloques[setnum].valid;
+        if(!valido) return i;
 
+        int ant_bloque = cache.vias[i].bloques[setnum].antiguedad;
         if(ant_bloque > ant_actual){
             ant_actual = ant_bloque;
             indice = i;
@@ -69,8 +77,8 @@ unsigned int get_blocknum(int address){
 }
 
 unsigned int get_offset(int address){
-	unsigned int offset = address << (cache.bits_tag + cache.bits_index);
-	return address >> (cache.bits_tag + cache.bits_index);
+	unsigned int offset = address & (tamanio_bloque-1);
+	return offset;
 }
 
 unsigned int get_tag(int address){
@@ -121,7 +129,9 @@ void read_block(int blocknum) {
 	unsigned int posicion_via = find_earliest(set);
 
 	block_destroy(&cache.vias[posicion_via].bloques[set]);
+
 	cache.vias[posicion_via].bloques[set] = obtener_bloque_de_memoria(address_16);
+
 	actualizar_antiguedad(address_16);
 	cache.vias[posicion_via].bloques[set].antiguedad = 1;
 }
@@ -155,7 +165,6 @@ char read_byte(int address, char *hit) {
 char write_byte(int address, char value, char *hit) {
 	
 	if(hay_hit(address)) {
-		printf("HIT\n");
 		cache.hits++;
 		unsigned int offset = get_offset(address);
 		block_t* bloque = obtener_bloque_de_cache(address);
@@ -180,7 +189,7 @@ char get_miss_rate(){
 }
 
 void cache_destruir() {
-	for(int i = 0; i < cant_vias; i++){
+	for(int i = 0; i < cache.cant_vias; i++){
 		via_destroy(&cache.vias[i]);
 	}
 	free(cache.vias);

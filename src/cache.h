@@ -7,6 +7,7 @@
 
 #include "block.h"
 #include "via.h"
+#include "cola.h"
 
 #define TAMANIO_MEMORIA_PRINCIPAL (64*1024)
 #define BITS_DIRECCION 16
@@ -16,6 +17,7 @@ typedef struct cache{
 	int hits;
 	int misses;
 	via_t* vias;
+  cola_t **fifos; 
 	int tamanio_cache;
 	int tamanio_bloque;
 	int cant_vias;

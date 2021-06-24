@@ -18,6 +18,7 @@ int bits_para_representar(int numero){
 }
 
 void cache_init() {
+	cache.error = false;
 	cache.inicializada = true;
 	cache.hits = 0;
 	cache.misses = 0;
@@ -49,10 +50,6 @@ unsigned int find_set(int address){
 	address_16 = address_16 >> (cache.bits_offset + cache.bits_tag);
 	unsigned int valor_retorno = (0xFFFF & address_16);
 	return valor_retorno;
-	/*
-	unsigned short index = address << cache.bits_tag;
-  	index = index >> (cache.bits_offset + cache.bits_tag);
-  	return index;*/
 }
 
 unsigned int find_earliest(int setnum){
@@ -153,6 +150,7 @@ char read_byte_cache(int address){
 
 char read_byte(int address, char *hit) {
 	if (!es_addr_valido(address)){
+		cache.error = true;
 		return ' ';
 	}
 	if(!hay_hit(address)){
@@ -169,6 +167,7 @@ char read_byte(int address, char *hit) {
 
 char write_byte(int address, char value, char *hit) {
 	if (!es_addr_valido(address)){
+		cache.error = true;
 		return ' ';
 	}
 	if(hay_hit(address)) {
@@ -201,5 +200,6 @@ void cache_destruir() {
 	}
 	free(cache.vias);
 	cache.inicializada = false;
+	cache.error = false;
 }
 

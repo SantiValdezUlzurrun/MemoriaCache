@@ -6,10 +6,15 @@
 bool interprete_crear(interprete_t* interprete, char* archivo_entrada, char* archivo_salida){
 	if (!interprete) return ERROR;
 
-	if (!(interprete->archivo_entrada = fopen(archivo_entrada, "r")))// || 
-	 //	!(interprete->archivo_salida = fopen(archivo_salida, "w")))
+	if (!(interprete->archivo_entrada = fopen(archivo_entrada, "r")))
 		return ERROR;
-	interprete->archivo_salida = stdout;
+
+	if (strcmp(archivo_salida,"") == 0) { 
+		interprete->archivo_salida = stdout;
+	}else {
+		if(!(interprete->archivo_salida = fopen(archivo_salida, "w")))
+			return ERROR;
+	}
 	return EXITO;
 }
 
@@ -20,8 +25,9 @@ void escribir(interprete_t* inter){
 	unsigned char byte = 0;
 	fscanf(inter->archivo_entrada, "%i,%hhu\n", &direccion, &byte);
 	write_byte(direccion, byte, &hit);
-	if (byte == ' '){
+	if (cache.error){
 		fprintf(inter->archivo_salida, "Dirreccion: %05i fuera de rango\n", direccion);
+		cache.error = false;
 	}
 	else {
 		fprintf(inter->archivo_salida, "Escritura:\tDireccion(%05i)\t\tValor(%hhu)\t%s\n", direccion, byte, hit? "Hit":"Miss");
@@ -34,8 +40,9 @@ void leer(interprete_t* inter){
 	int direccion = 0;
 	fscanf(inter->archivo_entrada, "%i\n",&direccion);
 	unsigned char byte = read_byte(direccion, &hit);
-	if (byte == ' '){
+	if (cache.error){
 		fprintf(inter->archivo_salida, "Dirreccion: %05i fuera de rango\n", direccion);
+		cache.error = false;
 	}
 	else {
 		fprintf(inter->archivo_salida,"Lectura:\tDireccion(%05i)\t\tValor(%hhu)\t%s\n", direccion, byte, hit?"Hit":"Miss");

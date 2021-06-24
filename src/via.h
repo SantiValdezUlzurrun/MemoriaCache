@@ -8,8 +8,6 @@
 typedef struct via{
 	block_t* bloques;
 	int cant_bloques;
-	int bloque_mas_viejo;
-	int* tags;
 }via_t;
 
 void via_init(via_t *via, int cantidad_bloques, int tamanio_bloque);

@@ -9,7 +9,6 @@ typedef struct {
   unsigned int tag;
   int antiguedad;
   bool valid;
-  bool dirty;
   unsigned short direccion;
   int bs;
 } block_t;

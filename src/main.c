@@ -42,7 +42,7 @@ unsigned int leer_uint(char* string){
 void mensaje_ayuda(){
 	
 	// Uso 
-	// ./tp2 -w ways -cs cachesize -bs blocksize [-o <outputprefix>] archivo
+	// ./tp2 -w ways -c cachesize -b blocksize [-o <outputprefix>] archivo
 	// ./tp2 [-h|-V]
 	//
 	// Convenciones: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html
@@ -121,6 +121,7 @@ config_t leer_argumentos(int argc, char* argv[]){
 	if (argc == 8 || argc == 10) {
 		strcpy(config.archivo_entrada, argv[argc - 1]);
 	}
+	
 	return config;
 }
 

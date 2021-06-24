@@ -13,6 +13,7 @@
 
 typedef struct cache{
 	bool inicializada;
+	bool error;
 	int hits;
 	int misses;
 	via_t* vias;

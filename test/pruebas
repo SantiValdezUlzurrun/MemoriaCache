@@ -44,7 +44,7 @@ echo  =========================================================
 ./tp2 -c 16 -w 1 -b 128 prueba3.mem
 
 echo "\n -- ARCHIVO prueba4.mem --"
-cat prueba3.mem
+cat prueba4.mem
 echo "\n"
 echo  =========================================================
 echo "Cachesize: 4  ways:4  blocksize:32  archivo:prueba4.mem"
@@ -58,7 +58,7 @@ echo  =========================================================
 ./tp2 -c 16 -w 1 -b 128 prueba4.mem
 
 echo "\n -- ARCHIVO prueba5.mem --"
-cat prueba3.mem
+cat prueba5.mem
 echo "\n"
 echo  =========================================================
 echo "Cachesize: 4  ways:4  blocksize:32  archivo:prueba5.mem"

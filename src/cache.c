@@ -8,6 +8,10 @@ bool en_rango(unsigned int a_chequear, unsigned int maximo){
 	return (a_chequear <= maximo);
 }
 
+bool es_addr_valido(unsigned int address){
+	return address < TAMANIO_MEMORIA_PRINCIPAL;
+}
+
 //Devuelve la cantidad de bits para representar el numero dado
 int bits_para_representar(int numero){
 	return ceil(log2(numero));
@@ -148,8 +152,9 @@ char read_byte_cache(int address){
 }
 
 char read_byte(int address, char *hit) {
-	
-	
+	if (!es_addr_valido(address)){
+		return ' ';
+	}
 	if(!hay_hit(address)){
 		read_block(get_blocknum(address));	
 		cache.misses++;	
@@ -163,7 +168,9 @@ char read_byte(int address, char *hit) {
 }
 
 char write_byte(int address, char value, char *hit) {
-	
+	if (!es_addr_valido(address)){
+		return ' ';
+	}
 	if(hay_hit(address)) {
 		cache.hits++;
 		unsigned int offset = get_offset(address);

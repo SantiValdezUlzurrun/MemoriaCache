@@ -19,8 +19,13 @@ void escribir(interprete_t* inter){
 	int direccion = 0;
 	unsigned char byte = 0;
 	fscanf(inter->archivo_entrada, "%i,%hhu\n", &direccion, &byte);
-	write_byte(direccion, byte, &hit);	
-	fprintf(inter->archivo_salida, "Escritura:\tDireccion(%05i)\t\tValor(%hhu)\t%s\n", direccion, byte, hit? "Hit":"Miss");
+	write_byte(direccion, byte, &hit);
+	if (byte == ' '){
+		fprintf(inter->archivo_salida, "Dirreccion: %05i fuera de rango\n", direccion);
+	}
+	else {
+		fprintf(inter->archivo_salida, "Escritura:\tDireccion(%05i)\t\tValor(%hhu)\t%s\n", direccion, byte, hit? "Hit":"Miss");
+	}
 }
 
 
@@ -28,14 +33,18 @@ void leer(interprete_t* inter){
 	char hit = 0;
 	int direccion = 0;
 	fscanf(inter->archivo_entrada, "%i\n",&direccion);
-	unsigned char byte = read_byte(direccion, &hit);	
-	fprintf(inter->archivo_salida,"Lectura:\tDireccion(%05i)\t\tValor(%hhu)\t%s\n", direccion, byte, hit?"Hit":"Miss");
+	unsigned char byte = read_byte(direccion, &hit);
+	if (byte == ' '){
+		fprintf(inter->archivo_salida, "Dirreccion: %05i fuera de rango\n", direccion);
+	}
+	else {
+		fprintf(inter->archivo_salida,"Lectura:\tDireccion(%05i)\t\tValor(%hhu)\t%s\n", direccion, byte, hit?"Hit":"Miss");
+	}
 }
 
 
 
 void interprete_interpretar(interprete_t* inter){
-
 	char instruccion[5] = "";
 	int i = 1;
 	char tacho[MAX_LINEA];

@@ -42,3 +42,31 @@ echo  =========================================================
 echo "Cachesize: 16  ways:1  blocksize:128  archivo:prueba3.mem"
 echo  =========================================================
 ./tp2 -c 16 -w 1 -b 128 prueba3.mem
+
+echo "\n -- ARCHIVO prueba4.mem --"
+cat prueba3.mem
+echo "\n"
+echo  =========================================================
+echo "Cachesize: 4  ways:4  blocksize:32  archivo:prueba4.mem"
+echo  =========================================================
+./tp2 -c 4 -w 4 -b 32 prueba4.mem
+
+echo 
+echo  =========================================================
+echo "Cachesize: 16  ways:1  blocksize:128  archivo:prueba4.mem"
+echo  =========================================================
+./tp2 -c 16 -w 1 -b 128 prueba4.mem
+
+echo "\n -- ARCHIVO prueba5.mem --"
+cat prueba3.mem
+echo "\n"
+echo  =========================================================
+echo "Cachesize: 4  ways:4  blocksize:32  archivo:prueba5.mem"
+echo  =========================================================
+./tp2 -c 4 -w 4 -b 32 prueba5.mem
+
+echo 
+echo  =========================================================
+echo "Cachesize: 16  ways:1  blocksize:128  archivo:prueba5.mem"
+echo  =========================================================
+./tp2 -c 16 -w 1 -b 128 prueba5.mem

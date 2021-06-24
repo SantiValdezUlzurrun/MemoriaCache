@@ -4,7 +4,6 @@
 void block_init(block_t *block, int block_size){
   block -> bs = block_size;
   block -> valid = false;
-  block-> dirty = false;
   block -> direccion = 0x0;
   block -> antiguedad = 0;
   block -> data = calloc(block_size, sizeof(char));

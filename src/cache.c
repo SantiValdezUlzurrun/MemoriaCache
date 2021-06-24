@@ -174,8 +174,7 @@ char write_byte(int address, char value, char *hit) {
 		cache.hits++;
 		unsigned int offset = get_offset(address);
 		block_t* bloque = obtener_bloque_de_cache(address);
-		bloque->data[offset] = value;
-		bloque->dirty = true;
+		bloque->data[offset] = value;	
 		actualizar_antiguedad(address);
 		bloque->antiguedad = 1;
 		*hit = 1;

@@ -9,7 +9,7 @@
 #include "interprete.h"
 
 #define ERROR_LECTURA -1
-#define ERROR_LEC_INT 1
+#define ERROR_LEC_INT -2
 #define MAXIMO_ARCHIVO 100
 
 const char VERSION[] = "1.0.0";
@@ -32,7 +32,7 @@ typedef struct config{
 
 unsigned int leer_uint(char* string){
 	long resultado = strtol(string, NULL, 10);
-	if(resultado > UINT_MAX || errno == ERANGE || resultado <= 1){
+	if(resultado > UINT_MAX || errno == ERANGE || resultado < 1){
 		return ERROR_LEC_INT;
 	}
 	return (unsigned int) resultado;
@@ -92,7 +92,7 @@ config_t leer_argumentos(int argc, char* argv[]){
 			case 'c':
 				if ((config.tamanio_cache = leer_uint(optarg)) == ERROR_LEC_INT) {
 					config.overflow = true;
-				} 
+				}
 			break;
 
 			case 'b':
@@ -104,7 +104,7 @@ config_t leer_argumentos(int argc, char* argv[]){
 			case 'w':
 				if ((config.cantidad_vias = leer_uint(optarg)) == ERROR_LEC_INT) {
 					config.overflow = true;
-				}	
+				}
 			break;
 
 			case 'h':
